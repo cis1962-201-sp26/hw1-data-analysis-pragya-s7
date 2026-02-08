@@ -5,21 +5,21 @@
  */
 
 const assert = require('assert');
-const { 
+const {
     parseData,
     cleanData,
     sentimentAnalysisApp,
     sentimentAnalysisLang,
     summaryStatistics,
-    labelSentiment
- } = require('../src/analysis');
+    labelSentiment,
+} = require('../src/analysis');
 
-const DATA_FILE = "./src/multilingual_mobile_app_reviews_2025.csv"
+const DATA_FILE = './src/multilingual_mobile_app_reviews_2025.csv';
 
 describe('Parsing Data', () => {
     it('csv should contain 2514 reviews after parsing', () => {
-        const csv = parseData(DATA_FILE)
-        assert.strictEqual(2514, csv.data.length)
+        const csv = parseData(DATA_FILE);
+        assert.strictEqual(2514, csv.data.length);
     });
 });
 
@@ -29,19 +29,19 @@ describe('Cleaning Data', () => {
     before(() => {
         csv = parseData(DATA_FILE);
         cleaned = cleanData(csv);
-        sample = cleaned[404]
+        sample = cleaned[404];
     });
 
     it('all non-gender null column values should be removed, resulting in 2348 reviews left.', () => {
-        assert.strictEqual(2348, cleaned.length)
+        assert.strictEqual(2348, cleaned.length);
     });
-    
+
     it('should merge user_id, user_age, user_country, and user_gender into a "user" object and remove original properties. Tests against a sample review in the dataset.', () => {
         assert.deepStrictEqual(sample.user, {
             user_age: 69,
             user_country: 'Vietnam',
             user_gender: 'Male',
-            user_id: 6363036
+            user_id: 6363036,
         });
         assert.strictEqual(sample.user_id, undefined);
         assert.strictEqual(sample.user_age, undefined);
@@ -72,23 +72,27 @@ describe('Sentiment Analysis', () => {
     });
 
     it('labelSentiment should correctly label input positive, neutral, and negative ratings, and destructure sample review objects properly when passed as an argument.', () => {
-        const sample1 = { rating: 4.1 }
-        const sample2 = { rating: 3.0 }
-        const sample3 = { rating: 1.9 }
+        const sample1 = { rating: 4.1 };
+        const sample2 = { rating: 3.0 };
+        const sample3 = { rating: 1.9 };
         assert.strictEqual(labelSentiment(sample1), 'positive');
         assert.strictEqual(labelSentiment(sample2), 'neutral');
         assert.strictEqual(labelSentiment(sample3), 'negative');
     });
 
     it('correctly structures the objects within the array returned from sentimentAnalysisApp, and returns the right number of negative, neutral, and positive reviews. Tests for the sample app Duolingo.', () => {
-        const duolingo = sentimentAnalysisApp(cleaned).find((app) => app.app_name === 'Duolingo');
+        const duolingo = sentimentAnalysisApp(cleaned).find(
+            (app) => app.app_name === 'Duolingo',
+        );
         assert.strictEqual(duolingo.positive, 8);
         assert.strictEqual(duolingo.neutral, 36);
         assert.strictEqual(duolingo.negative, 10);
     });
 
     it('correctly structures the objects within the array returned from sentimentAnalysisLang, and returns the right number of negative, neutral, and positive reviews. Tests for the sample language es.', () => {
-        const es = sentimentAnalysisLang(cleaned).find((lang) => lang.review_language === 'es');
+        const es = sentimentAnalysisLang(cleaned).find(
+            (lang) => lang.review_language === 'es',
+        );
         assert.strictEqual(es.positive, 30);
         assert.strictEqual(es.neutral, 52);
         assert.strictEqual(es.negative, 22);
